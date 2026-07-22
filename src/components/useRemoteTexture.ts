@@ -19,11 +19,12 @@ const getRepeatKey = (repeat?: [number, number]) => {
 export function useRemoteTexture(url?: string, options?: TextureOptions) {
   const { gl } = useThree()
   const [texture, setTexture] = useState<Texture | null>(null)
-  const repeatKey = useMemo(() => getRepeatKey(options?.repeat), [options?.repeat])
+  const repeat = options?.repeat
+  const colorSpace = options?.colorSpace
+  const repeatKey = useMemo(() => getRepeatKey(repeat), [repeat])
 
   useEffect(() => {
     if (!url) {
-      setTexture(null)
       return
     }
 
@@ -42,11 +43,11 @@ export function useRemoteTexture(url?: string, options?: TextureOptions) {
         loaded.wrapS = RepeatWrapping
         loaded.wrapT = RepeatWrapping
 
-        if (options?.repeat) {
-          loaded.repeat.set(options.repeat[0], options.repeat[1])
+        if (repeat) {
+          loaded.repeat.set(repeat[0], repeat[1])
         }
 
-        if (options?.colorSpace === 'srgb') {
+        if (colorSpace === 'srgb') {
           loaded.colorSpace = SRGBColorSpace
         }
 
@@ -64,7 +65,7 @@ export function useRemoteTexture(url?: string, options?: TextureOptions) {
     return () => {
       cancelled = true
     }
-  }, [url, repeatKey, options?.colorSpace, gl])
+  }, [url, repeatKey, repeat, colorSpace, gl])
 
-  return texture
+  return url ? texture : null
 }
